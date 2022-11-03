@@ -27,6 +27,8 @@ import com.marpies.ane.gameservices.utils.GameServicesHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.marpies.ane.gameservices.GameServicesExtensionContext.mHelper;
+
 public class ReportAchievementsFunction extends BaseFunction {
 
 	@Override
@@ -36,16 +38,17 @@ public class ReportAchievementsFunction extends BaseFunction {
 		AIR.log( "GameServices::reportAchievements" );
 		FREArray achievementsArray = (FREArray) args[0];
 
-		GameServicesHelper helper = GameServicesHelper.getInstance();
-		if( helper.isAuthenticated() ) {
+		AIR.getContext().createHelperIfNeeded(context.getActivity());
+		if( AIR.getContext().isSignedIn() ) {
 			List<GSAchievement> achievements = getAchievementsFromFREArray( achievementsArray );
 			for( GSAchievement achievement : achievements ) {
-				Games.Achievements.setSteps( helper.getClient(), achievement.getId(), achievement.getStep() );
+//				Games.Achievements.setSteps( helper.getClient(), achievement.getId(), achievement.getStep() );
+				mHelper.getmAchievementsClient().setSteps(achievement.getId(), achievement.getStep());
 			}
 			AIR.log( "Successfully set steps for achievements: " + achievements.toString() );
 			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_UPDATE_SUCCESS );
 		} else {
-			helper.dispatchAchievementUpdateError();
+			mHelper.dispatchAchievementUpdateError();
 		}
 
 		return null;

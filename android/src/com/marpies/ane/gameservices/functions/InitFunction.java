@@ -16,25 +16,31 @@
 
 package com.marpies.ane.gameservices.functions;
 
+import android.content.Intent;
+
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREObject;
 import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.utils.FREObjectUtils;
 import com.marpies.ane.gameservices.utils.GameServicesHelper;
+import com.marpies.ane.gameservices.utils.SignInActivity;
 
 public class InitFunction extends BaseFunction {
 
 	@Override
 	public FREObject call( FREContext context, FREObject[] args ) {
 		super.call( context, args );
+		AIR.log( "GameServices::init0" );
 
-		if( GameServicesHelper.getInstance().isInitialized() ) return null;
+		//if( GameServicesHelper.getInstance().isInitialized() ) return null;
 
 		boolean showLogs = FREObjectUtils.getBoolean( args[0] );
 		AIR.setLogEnabled( showLogs );
-		AIR.log( "GameServices::init" );
-
-		GameServicesHelper.getInstance().init();
+		AIR.log( "GameServices::init1" );
+		Intent intent = new Intent(context.getActivity().getApplicationContext(), SignInActivity.class);
+		intent.putExtra("shouldStartSignInFlow", false);
+		context.getActivity().startActivity(intent);
+		//GameServicesHelper.getInstance().init();
 
 		return null;
 	}

@@ -16,24 +16,31 @@
 
 package com.marpies.ane.gameservices.utils;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.gms.games.Game;
 import com.marpies.ane.gameservices.GameServicesExtensionContext;
+
+import java.util.List;
 
 public class AIR {
 
 	private static final String TAG = "GameServices";
 	private static boolean mLogEnabled = false;
 
+
 	private static GameServicesExtensionContext mContext;
 
 	public static void log( String message ) {
 		if( mLogEnabled ) {
-			Log.i( TAG, message );
+			Log.d( TAG, message );
 		}
 	}
+
 
 	public static void dispatchEvent( String eventName ) {
 		dispatchEvent( eventName, "" );

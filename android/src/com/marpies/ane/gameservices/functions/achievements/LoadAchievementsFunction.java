@@ -16,13 +16,18 @@
 
 package com.marpies.ane.gameservices.functions.achievements;
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREObject;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.games.achievement.Achievements;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.marpies.ane.gameservices.events.GameServicesEvent;
 import com.marpies.ane.gameservices.functions.BaseFunction;
 import com.marpies.ane.gameservices.utils.AIR;
@@ -34,7 +39,9 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
-public class LoadAchievementsFunction extends BaseFunction implements ResultCallback<Achievements.LoadAchievementsResult> {
+import static com.marpies.ane.gameservices.GameServicesExtensionContext.mHelper;
+
+public class LoadAchievementsFunction extends BaseFunction /*implements ResultCallback<Achievements.LoadAchievementsResult> */{
 
 	@Override
 	public FREObject call( FREContext context, FREObject[] args ) {
@@ -42,9 +49,38 @@ public class LoadAchievementsFunction extends BaseFunction implements ResultCall
 
 		AIR.log( "GameServices::loadAchievements" );
 
-		if( GameServicesHelper.getInstance().isAuthenticated() ) {
-			PendingResult<Achievements.LoadAchievementsResult> result = Games.Achievements.load( GameServicesHelper.getInstance().getClient(), false );
-			result.setResultCallback( this, 10, TimeUnit.SECONDS );
+		AIR.getContext().createHelperIfNeeded(context.getActivity());
+		if( AIR.getContext().isSignedIn() ) {
+//			PendingResult<Achievements.LoadAchievementsResult> result = Games.Achievements.load( GameServicesHelper.getInstance().getClient(), false );
+//			result.setResultCallback( this, 10, TimeUnit.SECONDS );
+			mHelper.getmAchievementsClient().load(false)
+					.addOnSuccessListener(new OnSuccessListener<AnnotatedData<AchievementBuffer>>() {
+				@Override
+				public void onSuccess(AnnotatedData<AchievementBuffer> achievementBufferAnnotatedData) {
+					JSONArray achievementsArray = GSAchievementUtils.toJSONArray( achievementBufferAnnotatedData.get() );
+					//achievementBufferAnnotatedData.get().release();
+					JSONObject response = new JSONObject();
+					try
+					{
+						response.put( "achievements", achievementsArray );
+						AIR.log( "Successfully loaded achievements" );
+						AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_SUCCESS, response.toString() );
+					} catch( JSONException e )
+					{
+						e.printStackTrace();
+						AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, e.getMessage() );
+					}
+				}
+			})
+					.addOnFailureListener(new OnFailureListener() {
+						@Override
+						public void onFailure(@NonNull Exception e) {
+							AIR.log( "Failed to load achievements: " + e.getMessage() );
+							AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, e.getMessage() );
+							//webAppInterface.showToast("loadAchievements failed");
+							//webAppInterface.jscallback_loadAchievements(strJSONAchievements);
+						}
+					});
 		} else {
 			AIR.log( "User is not signed in." );
 			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, "User is not signed in." );
@@ -53,28 +89,28 @@ public class LoadAchievementsFunction extends BaseFunction implements ResultCall
 		return null;
 	}
 
-	@Override
-	public void onResult( @NonNull Achievements.LoadAchievementsResult result ) {
-		com.google.android.gms.common.api.Status status = result.getStatus();
-
-		if( !status.isSuccess() ) {
-			result.release();
-			AIR.log( "Failed to load achievements: " + status.getStatusMessage() );
-			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, status.getStatusMessage() );
-			return;
-		}
-
-		JSONArray achievementsArray = GSAchievementUtils.toJSONArray( result.getAchievements() );
-		result.release();
-		JSONObject response = new JSONObject();
-		try {
-			response.put( "achievements", achievementsArray );
-			AIR.log( "Successfully loaded achievements" );
-			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_SUCCESS, response.toString() );
-		} catch( JSONException e ) {
-			e.printStackTrace();
-			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, e.getMessage() );
-		}
-	}
+//	@Override
+//	public void onResult( @NonNull Achievements.LoadAchievementsResult result ) {
+//		com.google.android.gms.common.api.Status status = result.getStatus();
+//
+//		if( !status.isSuccess() ) {
+//			result.release();
+//			AIR.log( "Failed to load achievements: " + status.getStatusMessage() );
+//			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, status.getStatusMessage() );
+//			return;
+//		}
+//
+//		JSONArray achievementsArray = GSAchievementUtils.toJSONArray( result.getAchievements() );
+//		result.release();
+//		JSONObject response = new JSONObject();
+//		try {
+//			response.put( "achievements", achievementsArray );
+//			AIR.log( "Successfully loaded achievements" );
+//			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_SUCCESS, response.toString() );
+//		} catch( JSONException e ) {
+//			e.printStackTrace();
+//			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_LOAD_ERROR, e.getMessage() );
+//		}
+//	}
 }
 

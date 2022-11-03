@@ -16,20 +16,33 @@
 
 package com.marpies.ane.gameservices;
 
+import android.app.Activity;
+import android.util.Log;
+
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
+import com.marpies.ane.gameservices.events.GameServicesEvent;
 import com.marpies.ane.gameservices.functions.*;
 import com.marpies.ane.gameservices.functions.achievements.*;
 import com.marpies.ane.gameservices.functions.leaderboards.ReportScoreFunction;
 import com.marpies.ane.gameservices.functions.leaderboards.ShowLeaderboardsUIFunction;
 import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.functions.IsSupportedFunction;
+import com.marpies.ane.gameservices.utils.GameServicesHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class GameServicesExtensionContext extends FREContext {
+//import static com.marpies.ane.gameservices.utils.AIR.dispatchEvent;
+import static com.marpies.ane.gameservices.utils.AIR.log;
 
+public class GameServicesExtensionContext extends FREContext
+		implements GameServicesHelper.GameServicesHelperListener {
+	private static final String TAG = "GameServicesExtContext";
+	public static GameServicesHelper mHelper;
+	private List<Activity> _activityInstances;
 	@Override
 	public Map<String, FREFunction> getFunctions() {
 		Map<String, FREFunction> functions = new HashMap<String, FREFunction>();
@@ -62,5 +75,94 @@ public class GameServicesExtensionContext extends FREContext {
 	@Override
 	public void dispose() {
 		AIR.setContext( null );
+	}
+	public void logEvent(String eventName)
+	{
+		Log.i(TAG, eventName);
+	}
+//	public void dispatchEvent(String eventName)
+//	{
+//		dispatchEvent(eventName, "OK");
+//	}
+//
+//
+//
+//	public void dispatchEvent(String eventName, String eventData)
+//	{
+//		logEvent(eventName);
+//		if (eventData == null)
+//		{
+//			eventData = "OK";
+//		}
+//		dispatchStatusEventAsync(eventName, eventData);
+//	}
+
+	public GameServicesHelper createHelperIfNeeded(Activity activity)
+	{
+		if (mHelper == null)
+		{
+			log("create helper");
+			mHelper = new GameServicesHelper(activity, 0);
+			log("setup");
+			mHelper.setup(this);
+		}
+		return mHelper;
+	}
+	public void registerActivity(Activity activity)
+	{
+		if (_activityInstances == null)
+		{
+			_activityInstances = new ArrayList<Activity>();
+		}
+		_activityInstances.add(activity);
+	}
+
+	public void signOut()
+	{
+		logEvent("signOut");
+
+		mHelper.signOut();
+		//dispatchEvent("ON_SIGN_OUT_SUCCESS");
+	}
+
+	public Boolean isSignedIn()
+	{
+		logEvent("isSignedIn");
+		return mHelper.isSignedIn();
+	}
+
+	@Override
+	public void onSignInFailed() {
+		logEvent("onSignInFailed");
+		//dispatchEvent("ON_SIGN_IN_FAIL");
+		if (_activityInstances != null)
+		{
+			for (Activity activity : _activityInstances)
+			{
+				if (activity != null)
+				{
+					activity.finish();
+				}
+			}
+			_activityInstances = null;
+		}
+	}
+
+	@Override
+	public void onSignInSucceeded() {
+		logEvent("onSignInSucceeded");
+		//AIR.dispatchEvent( GameServicesEvent.AUTH_SUCCESS, "Auth Success" );
+		//dispatchEvent("ON_SIGN_IN_SUCCESS");
+		if (_activityInstances != null)
+		{
+			for (Activity activity : _activityInstances)
+			{
+				if (activity != null)
+				{
+					activity.finish();
+				}
+			}
+			_activityInstances = null;
+		}
 	}
 }

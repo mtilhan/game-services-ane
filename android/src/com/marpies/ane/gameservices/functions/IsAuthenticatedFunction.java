@@ -30,7 +30,7 @@ public class IsAuthenticatedFunction extends BaseFunction {
 
 		AIR.log( "GameServices::isAuthenticated" );
 		try {
-			return FREObject.newObject( GameServicesHelper.getInstance().isAuthenticated() );
+			return FREObject.newObject( AIR.getContext().isSignedIn() );
 		} catch( FREWrongThreadException e ) {
 			e.printStackTrace();
 		}

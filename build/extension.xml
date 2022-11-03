@@ -10,14 +10,6 @@
         </applicationDeployment>
     </platform>
 
-    <platform name="iPhone-x86">
-        <applicationDeployment>
-            <nativeLibrary>libGameServices.a</nativeLibrary>
-            <initializer>GameServicesInitializer</initializer>
-            <finalizer>GameServicesFinalizer</finalizer>
-        </applicationDeployment>
-    </platform>
-
     <platform name="Android-ARM">
         <applicationDeployment>
             <nativeLibrary>libGameServices.jar</nativeLibrary>
@@ -25,7 +17,13 @@
             <finalizer>com.marpies.ane.gameservices.GameServicesExtension</finalizer>
         </applicationDeployment>
     </platform>
-
+    <platform name="Android-ARM64">
+        <applicationDeployment>
+            <nativeLibrary>libGameServices.jar</nativeLibrary>
+            <initializer>com.marpies.ane.gameservices.GameServicesExtension</initializer>
+            <finalizer>com.marpies.ane.gameservices.GameServicesExtension</finalizer>
+        </applicationDeployment>
+    </platform>
     <platform name="Android-x86">
         <applicationDeployment>
             <nativeLibrary>libGameServices.jar</nativeLibrary>

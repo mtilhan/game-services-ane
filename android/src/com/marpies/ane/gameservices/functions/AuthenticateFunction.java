@@ -16,10 +16,13 @@
 
 package com.marpies.ane.gameservices.functions;
 
+import android.content.Intent;
+
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREObject;
 import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.utils.GameServicesHelper;
+import com.marpies.ane.gameservices.utils.SignInActivity;
 
 public class AuthenticateFunction extends BaseFunction {
 
@@ -28,7 +31,9 @@ public class AuthenticateFunction extends BaseFunction {
 		super.call( context, args );
 
 		AIR.log( "GameServices::auth" );
-		GameServicesHelper.getInstance().signIn();
+		Intent intent = new Intent(context.getActivity().getApplicationContext(), SignInActivity.class);
+		context.getActivity().startActivity(intent);
+		//GameServicesHelper.getInstance().signIn();
 
 		return null;
 	}

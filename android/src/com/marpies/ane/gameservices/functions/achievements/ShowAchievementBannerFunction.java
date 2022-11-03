@@ -25,23 +25,28 @@ import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.utils.FREObjectUtils;
 import com.marpies.ane.gameservices.utils.GameServicesHelper;
 
+import static com.marpies.ane.gameservices.GameServicesExtensionContext.mHelper;
+
 public class ShowAchievementBannerFunction extends BaseFunction {
 
 	@Override
 	public FREObject call( FREContext context, FREObject[] args ) {
 		super.call( context, args );
 
-		GameServicesHelper helper = GameServicesHelper.getInstance();
-		if( helper.isAuthenticated() ) {
+		AIR.getContext().createHelperIfNeeded(context.getActivity());
+		if( AIR.getContext().isSignedIn() ) {
 			boolean showBanner = FREObjectUtils.getBoolean( args[0] );
 			AIR.log( "GameServices::showAchievementBanner - " + showBanner );
 			if( showBanner ) {
 				AIR.log( "Setting AIR activity decor view" );
-				Games.setViewForPopups( helper.getClient(), AIR.getContext().getActivity().getWindow().getDecorView() );
+				//Games.setViewForPopups( helper.getClient(), AIR.getContext().getActivity().getWindow().getDecorView() );
+				Games.getGamesClient(AIR.getContext().getActivity(), mHelper.getmSignedInAccount()).setViewForPopups(AIR.getContext().getActivity().getWindow().getDecorView());
 			} else {
 				AIR.log( "Setting dummy view" );
 				ImageView dummyView = new ImageView( AIR.getContext().getActivity() );
-				Games.setViewForPopups( helper.getClient(), dummyView );
+//				Games.setViewForPopups( helper.getClient(), dummyView );
+				Games.getGamesClient(AIR.getContext().getActivity(), mHelper.getmSignedInAccount()).setViewForPopups(dummyView);
+
 			}
 		}
 

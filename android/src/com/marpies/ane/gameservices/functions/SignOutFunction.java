@@ -18,8 +18,11 @@ package com.marpies.ane.gameservices.functions;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREObject;
+import com.marpies.ane.gameservices.GameServicesExtension;
 import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.utils.GameServicesHelper;
+
+import java.security.cert.Extension;
 
 public class SignOutFunction extends BaseFunction {
 
@@ -28,7 +31,9 @@ public class SignOutFunction extends BaseFunction {
 		super.call( context, args );
 
 		AIR.log( "GameServices::logout" );
-		GameServicesHelper.getInstance().signOut();
+		AIR.getContext().createHelperIfNeeded(context.getActivity());
+		AIR.getContext().signOut();
+		//GameServicesHelper.getInstance().signOut();
 
 		return null;
 	}

@@ -5,7 +5,7 @@
     <property file="build.properties"/>
 
     <!-- All -->
-     <target name="all" depends="swc,ios,ios-sim,android,package" description="Full build of extension"/> 
+     <target name="all" depends="swc,ios,android,package" description="Full build of extension"/> 
 
     <!--
 
@@ -21,12 +21,12 @@
         </antcall>
     </target>
 
-    <target name="ios-sim" description="Build iOS project for iOS simulators.">
+    <!-- <target name="ios-sim" description="Build iOS project for iOS simulators.">
         <antcall target="ios-build">
             <param name="IOS_TARGET" value="iphonesimulator"/>
             <param name="IOS_DIR" value="ios-simulator"/>
         </antcall>
-    </target>
+    </target> -->
 
     <target name="ios-build" description="Build iOS Library">
         <echo message="RUNNING IOS-BUILD WITH ${IOS_TARGET} and ${IOS_DIR}" />
@@ -44,6 +44,8 @@
             <arg line="-project ${name}.xcodeproj"/>
             <arg line="-sdk ${IOS_TARGET}"/>
             <arg line="-alltargets"/>
+            <!-- <arg value="ARCHS=armv7 arm64"/> -->
+            <!-- <arg value="ONLY_ACTIVE_ARCH=NO"/> -->
             <arg line="-configuration Release"/>
             <arg line="SYMROOT=../build/temp/${IOS_DIR}/build/"/>
         </exec>
@@ -91,9 +93,9 @@
         <zip basedir="temp/android/aar/classes" destfile="temp/android/aar/classes/reziped.jar" />
         <copy file="temp/android/aar/classes/reziped.jar" tofile="temp/android/lib${name}.jar" overwrite="true" />
         <!-- copy resources -->
-        <copy todir="temp/android/com.marpies.ane.gameservices-res/">
+        <!-- <copy todir="temp/android/com.marpies.ane.gameservices-res/">
             <fileset dir="temp/android/aar/res/"/>
-        </copy>
+        </copy> -->
         <!-- clean up -->
         <delete dir="temp/android/aar" />
     </target>
@@ -169,8 +171,8 @@
             <arg value="../extension.xml"/>
             <arg line="-swc swc/${name}.swc"/>
             <arg line="-platform iPhone-ARM -platformoptions ../platform-ios.xml -C ios/ ."/>
-            <arg line="-platform iPhone-x86 -platformoptions ../platform-ios.xml -C ios-simulator/ ."/>
             <arg line="-platform Android-ARM -C android/ ."/>
+            <arg line="-platform Android-ARM64 -C android/ ."/>
             <arg line="-platform Android-x86 -C android/ ."/>
             <arg line="-platform default -C default/ ."/>
         </exec>

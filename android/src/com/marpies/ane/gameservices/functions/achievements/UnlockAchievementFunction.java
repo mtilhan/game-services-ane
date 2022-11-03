@@ -16,13 +16,16 @@
 
 package com.marpies.ane.gameservices.functions.achievements;
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREObject;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.achievement.Achievements;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.marpies.ane.gameservices.events.GameServicesEvent;
 import com.marpies.ane.gameservices.functions.BaseFunction;
 import com.marpies.ane.gameservices.utils.AIR;
@@ -31,7 +34,9 @@ import com.marpies.ane.gameservices.utils.GameServicesHelper;
 
 import java.util.concurrent.TimeUnit;
 
-public class UnlockAchievementFunction extends BaseFunction implements ResultCallback<Achievements.UpdateAchievementResult> {
+import static com.marpies.ane.gameservices.GameServicesExtensionContext.mHelper;
+
+public class UnlockAchievementFunction extends BaseFunction /*implements ResultCallback<Achievements.UpdateAchievementResult> */{
 
 	@Override
 	public FREObject call( FREContext context, FREObject[] args ) {
@@ -41,36 +46,39 @@ public class UnlockAchievementFunction extends BaseFunction implements ResultCal
 		String achievementId = FREObjectUtils.getString( args[0] );
 		boolean immediate = FREObjectUtils.getBoolean( args[1] );
 
-		GameServicesHelper helper = GameServicesHelper.getInstance();
-		if( helper.isAuthenticated() ) {
+		AIR.getContext().createHelperIfNeeded(context.getActivity());
+		if( AIR.getContext().isSignedIn() ) {
 			if( immediate ) {
-				PendingResult<Achievements.UpdateAchievementResult> result = Games.Achievements.unlockImmediate( helper.getClient(), achievementId );
-				result.setResultCallback( this, 10, TimeUnit.SECONDS );
+//				PendingResult<Achievements.UpdateAchievementResult> result = Games.Achievements.unlockImmediate( helper.getClient(), achievementId );
+//				result.setResultCallback( this, 10, TimeUnit.SECONDS );
+				mHelper.getmAchievementsClient().unlockImmediate(achievementId)
+						.addOnCompleteListener(new OnCompleteListener<Void>() {
+							@Override
+							public void onComplete(@NonNull Task<Void> task) {
+								if(task.isSuccessful())
+								{
+									AIR.log( "Successfully unlocked achievement" );
+									AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_UPDATE_SUCCESS );
+								}
+								else
+								{
+									AIR.log( "Failed to unlock achievement: " + task.getException().toString() );
+									AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_UPDATE_ERROR, task.getException().toString() );
+								}
+							}
+						});
 				return null;
 			}
-
-			Games.Achievements.unlock( helper.getClient(), achievementId );
+//
+//			Games.Achievements.unlock( helper.getClient(), achievementId );
+			mHelper.getmAchievementsClient().unlock(achievementId);
 			AIR.log( "Successfully unlocked achievement: " + achievementId );
 			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_UPDATE_SUCCESS );
 		} else {
-			helper.dispatchAchievementUpdateError();
+			mHelper.dispatchAchievementUpdateError();
 		}
 
 		return null;
-	}
-
-	@Override
-	public void onResult( @NonNull Achievements.UpdateAchievementResult result ) {
-		com.google.android.gms.common.api.Status status = result.getStatus();
-
-		if( !status.isSuccess() ) {
-			AIR.log( "Failed to unlock achievement: " + status.getStatusMessage() );
-			AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_UPDATE_ERROR, status.getStatusMessage() );
-			return;
-		}
-
-		AIR.log( "Successfully unlocked achievement" );
-		AIR.dispatchEvent( GameServicesEvent.ACHIEVEMENT_UPDATE_SUCCESS );
 	}
 }
 

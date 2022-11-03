@@ -23,6 +23,8 @@ import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.utils.FREObjectUtils;
 import com.marpies.ane.gameservices.utils.GameServicesHelper;
 
+import static com.marpies.ane.gameservices.GameServicesExtensionContext.mHelper;
+
 public class ShowAchievementsUIFunction extends BaseFunction {
 
 	@Override
@@ -30,7 +32,7 @@ public class ShowAchievementsUIFunction extends BaseFunction {
 		super.call( context, args );
 
 		AIR.log( "GameServices::showAchievementsUI" );
-		GameServicesHelper.getInstance().showAchievementsUI();
+		mHelper.showAchievementsUI();
 
 		return null;
 	}

@@ -24,6 +24,8 @@ import com.marpies.ane.gameservices.utils.AIR;
 import com.marpies.ane.gameservices.utils.FREObjectUtils;
 import com.marpies.ane.gameservices.utils.GameServicesHelper;
 
+import static com.marpies.ane.gameservices.GameServicesExtensionContext.mHelper;
+
 public class ShowLeaderboardsUIFunction extends BaseFunction {
 
     @Override
@@ -39,7 +41,7 @@ public class ShowLeaderboardsUIFunction extends BaseFunction {
             return null;
         }
 
-        GameServicesHelper.getInstance().showLeaderboardsUI( leaderboardId );
+        mHelper.showLeaderboardsUI( leaderboardId );
 
         return null;
     }
