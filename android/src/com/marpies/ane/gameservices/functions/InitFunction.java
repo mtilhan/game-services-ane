@@ -30,7 +30,7 @@ public class InitFunction extends BaseFunction {
 	@Override
 	public FREObject call( FREContext context, FREObject[] args ) {
 		super.call( context, args );
-		AIR.log( "GameServices::init0" );
+		AIR.log( "GameServices::init new" );
 
 		//if( GameServicesHelper.getInstance().isInitialized() ) return null;
 
@@ -39,7 +39,11 @@ public class InitFunction extends BaseFunction {
 		AIR.log( "GameServices::init1" );
 		Intent intent = new Intent(context.getActivity().getApplicationContext(), SignInActivity.class);
 		intent.putExtra("shouldStartSignInFlow", false);
-		context.getActivity().startActivity(intent);
+		try {
+			context.getActivity().startActivity(intent);
+	   	} catch (Exception e) {
+			AIR.log( "GameServices::Error"+e.getMessage());
+		}
 		//GameServicesHelper.getInstance().init();
 
 		return null;
