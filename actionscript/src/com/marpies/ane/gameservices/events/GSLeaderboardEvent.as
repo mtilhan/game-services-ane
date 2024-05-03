@@ -1,6 +1,7 @@
 package com.marpies.ane.gameservices.events {
 
     import flash.events.Event;
+    import com.marpies.ane.gameservices.leaderboards.GSLeaderboardScore;
 
     /**
      * Dispatched when one of the method related to leaderboards is called.
@@ -32,11 +33,18 @@ package com.marpies.ane.gameservices.events {
          */
         public static const UI_ERROR:String = "GSLeaderboardEvent::uiError";
 
+        
+        public static const LOAD_SUCCESS:String = "GSLeaderboardEvent::loadSuccess";
+
+        private var mScores:Vector.<GSLeaderboardScore>;
         /**
          * @private
          */
-        public function GSLeaderboardEvent( type:String, errorMessage:String = null ) {
+        public function GSLeaderboardEvent( type:String, errorMessage:String = null, scores:Vector.<GSLeaderboardScore> = null ) {
             super( type, errorMessage );
+
+             mScores = scores;
+
         }
 
         /**
@@ -44,6 +52,10 @@ package com.marpies.ane.gameservices.events {
          */
         override public function clone():Event {
             return new GSLeaderboardEvent( type, errorMessage );
+        }
+
+        public function get scores():Vector.<GSLeaderboardScore> {
+            return mScores;
         }
     }
 

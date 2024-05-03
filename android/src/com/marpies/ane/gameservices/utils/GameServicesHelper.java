@@ -276,7 +276,10 @@ public class GameServicesHelper /*implements
 		return resultCode == ConnectionResult.SUCCESS;
 	}
 	public boolean isSignedIn() {
-		return GoogleSignIn.getLastSignedInAccount(mGoogleSignInClient.getApplicationContext()) != null;
+		GoogleSignInAccount val = GoogleSignIn.getLastSignedInAccount(mGoogleSignInClient.getApplicationContext());
+		
+		//NOTE: val.getId checked userId for multiple account selection problem
+		return val != null && val.getId() != "";
 	}
 
 
@@ -297,6 +300,7 @@ public class GameServicesHelper /*implements
 							onConnected(task.getResult());
 						} else {
 							Log.d(TAG, "signInSilently(): failure", task.getException());
+							AIR.dispatchEvent( GameServicesEvent.AUTH_ERROR, task.getException().getMessage() );
 							onDisconnected();
 						}
 					}
@@ -428,10 +432,13 @@ public class GameServicesHelper /*implements
 		//String message = getString(R.string.status_exception_error, details, status, e);
 		String message = "There was an issue with sign in.  Please try again later." + details + status + e;
 
+		AIR.log(message);
+		/*
 		new AlertDialog.Builder(AIR.getContext().getActivity().getApplicationContext())
 				.setMessage(message)
 				.setNeutralButton("OK", null)
 				.show();
+		 */
 	}
 
 	/**
@@ -587,6 +594,8 @@ public class GameServicesHelper /*implements
 							Exception e = task.getException();
 							handleException(e, "There was an issue communicating with players.");
 							displayName = "???";
+							AIR.log("error");
+							AIR.dispatchEvent( GameServicesEvent.AUTH_ERROR, "error" );
 						}
 						mDisplayName = displayName;
 						AIR.log("Display Name: " + mDisplayName);

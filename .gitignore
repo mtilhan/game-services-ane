@@ -16,3 +16,5 @@ FlashRuntimeExtensions.jar
 libGameServices.a
 
 runtimeClasses.jar
+
+build/temp/

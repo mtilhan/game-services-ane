@@ -24,6 +24,7 @@ import com.adobe.fre.FREFunction;
 import com.marpies.ane.gameservices.events.GameServicesEvent;
 import com.marpies.ane.gameservices.functions.*;
 import com.marpies.ane.gameservices.functions.achievements.*;
+import com.marpies.ane.gameservices.functions.leaderboards.LoadLeaderBoardFunction;
 import com.marpies.ane.gameservices.functions.leaderboards.ReportScoreFunction;
 import com.marpies.ane.gameservices.functions.leaderboards.ShowLeaderboardsUIFunction;
 import com.marpies.ane.gameservices.utils.AIR;
@@ -68,6 +69,7 @@ public class GameServicesExtensionContext extends FREContext
         /* Leaderboards */
         functions.put( "reportScore", new ReportScoreFunction() );
         functions.put( "showLeaderboardsUI", new ShowLeaderboardsUIFunction() );
+		functions.put( "loadLeaderboard", new LoadLeaderBoardFunction() );
 
 		return functions;
 	}
@@ -127,8 +129,9 @@ public class GameServicesExtensionContext extends FREContext
 
 	public Boolean isSignedIn()
 	{
-		logEvent("isSignedIn");
-		return mHelper.isSignedIn();
+		Boolean val = mHelper.isSignedIn();
+		logEvent("isSignedIn_"+val);
+		return val;
 	}
 
 	@Override

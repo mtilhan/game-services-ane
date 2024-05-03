@@ -58,8 +58,8 @@
             <fileset dir="../ios/GameServices/Frameworks/AIRExtHelpers.framework"/>
         </copy>
 
-        <!-- remove the build directory -->
-        <delete dir="temp/${IOS_DIR}/build/"/>
+        <!-- remove the build directory <delete dir="temp/${IOS_DIR}/build/"/>-->
+        
     </target>
 
     <!--
@@ -179,7 +179,8 @@
 
         <move file="temp/${packageName}.ane" todir="../bin"/>
 
-        <delete dir="temp/"/> 
+        <!--
+        <delete dir="temp/"/> -->
     </target>
 
 

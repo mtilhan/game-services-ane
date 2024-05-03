@@ -1,4 +1,4 @@
-package com.marpies.ane.gameservices.leaderboards {
+﻿package com.marpies.ane.gameservices.leaderboards {
 
     import com.marpies.ane.gameservices.GameServices;
     import com.marpies.ane.gameservices.events.GSLeaderboardEvent;
@@ -23,6 +23,9 @@ package com.marpies.ane.gameservices.leaderboards {
 
         private static const REPORT_SCORE_SUCCESS:String = "reportScoreSuccess";
         private static const REPORT_SCORE_ERROR:String = "reportScoreError";
+
+        private static const LEADERBOARD_LOAD_SUCCESS:String = "leaderboardLoadSuccess";
+
 
         CONFIG::ane {
             private var mContext:ExtensionContext;
@@ -130,6 +133,20 @@ package com.marpies.ane.gameservices.leaderboards {
             }
         }
 
+
+        /**
+         * TODO: Add description
+         */
+        public function loadTopScores( leaderboardId:String, timeSpan:int, leaderboardCollection:int, maxResult:int = 25 ):void {
+            if( !GameServices.isSupported ) return;
+
+            if( leaderboardId == null ) throw new ArgumentError( "Parameter leaderboardId cannot be null." );
+
+            CONFIG::ane {
+                mContext.call( "loadLeaderboard", leaderboardId, timeSpan, leaderboardCollection, maxResult);
+            }
+        }
+
         /**
          *
          *
@@ -158,6 +175,11 @@ package com.marpies.ane.gameservices.leaderboards {
 
                 case REPORT_SCORE_ERROR:
                     dispatchScoreReportError( event.level );
+                    return;
+
+                case LEADERBOARD_LOAD_SUCCESS:
+                    var json:Object = JSON.parse( event.level );
+                    dispatchLeaderboardLoadSuccess( json.scores);
                     return;
             }
         }
@@ -190,6 +212,15 @@ package com.marpies.ane.gameservices.leaderboards {
             if( !hasEventListener( GSLeaderboardEvent.REPORT_ERROR ) ) return;
 
             dispatchEvent( new GSLeaderboardEvent( GSLeaderboardEvent.REPORT_ERROR, errorMessage ) );
+        }
+
+        private function dispatchLeaderboardLoadSuccess( json:Object ):void {
+            if( json is String ) {
+                json = JSON.parse( json as String );
+            }
+            if( json is Array ) {
+                dispatchEvent( new GSLeaderboardEvent( GSLeaderboardEvent.LOAD_SUCCESS, null, GSLeaderboardScore.fromJSONArray( json as Array )) );
+            }
         }
 
         private function addNativeListener():void {

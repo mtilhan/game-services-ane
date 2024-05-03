@@ -32,7 +32,11 @@ public class AuthenticateFunction extends BaseFunction {
 
 		AIR.log( "GameServices::auth" );
 		Intent intent = new Intent(context.getActivity().getApplicationContext(), SignInActivity.class);
-		context.getActivity().startActivity(intent);
+		try {
+			context.getActivity().startActivity(intent);
+		} catch (Exception e) {
+			AIR.log( "GameServices::Error"+e.getMessage());
+		}
 		//GameServicesHelper.getInstance().signIn();
 
 		return null;

@@ -41,5 +41,6 @@ public class GameServicesEvent {
 
     public static final String REPORT_SCORE_SUCCESS = "reportScoreSuccess";
     public static final String REPORT_SCORE_ERROR = "reportScoreError";
+	public static final String LEADERBOARD_LOAD_SUCCESS = "leaderboardLoadSuccess";
 
 }
